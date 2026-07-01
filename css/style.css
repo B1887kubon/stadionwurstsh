@@ -163,6 +163,7 @@ a:hover {
 /* Map */
 .map-wrapper {
   position: relative;
+  z-index: 1;
   flex: 1 1 auto;
   min-height: 70vh;
   margin: 1.25rem 0 0;
@@ -198,6 +199,26 @@ a:hover {
   width: 100%;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+/* Wird per JS gesetzt, wenn neben dem Pin wenig Platz ist (siehe popupOptionenBerechnen in
+   karte.js) – Spalten stapeln statt sie unleserlich zusammenzuquetschen. Eine CSS-Container-Query
+   wäre hier die naheliegende Wahl, kollidiert aber mit Leaflets eigener Breitenmessung
+   (container-type: inline-size verhindert, dass die natürliche Inhaltsbreite nach oben
+   durchgereicht wird), deshalb die Klasse direkt anhand der ohnehin berechneten Zielbreite. */
+.popup-content.popup-schmal .popup-header {
+  flex-direction: column;
+}
+
+.popup-content.popup-schmal .popup-facts {
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.popup-content.popup-schmal .popup-fact {
+  flex-direction: row;
+  justify-content: space-between;
+  text-align: left;
 }
 
 .popup-header {

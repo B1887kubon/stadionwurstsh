@@ -119,26 +119,40 @@
     );
   }
 
-  function popupSeiteAnwenden(karte, marker, popup) {
-    var element = popup.getElement();
-    if (!element) return;
-
-    var kartenBreite = karte.getSize().x;
-
-    // Breite an den verfügbaren Platz anpassen, damit die Card auf dem Handy nicht über den Rand hinausragt
-    var maxBreite = Math.min(600, Math.max(260, kartenBreite - 64));
-    var minBreite = Math.min(320, maxBreite);
-    popup.options.maxWidth = maxBreite;
-    popup.options.minWidth = minBreite;
-
+  // Berechnet Breite, Höhe und Versatz des Popups anhand des tatsächlich verfügbaren Platzes
+  // rund um den Pin, damit die Card garantiert innerhalb der Karte bleibt (kein autoPan nötig,
+  // das bei mehrfachem Aufruf mit wechselnden Maßen die Karte an eine völlig falsche Stelle
+  // verschieben kann).
+  function popupOptionenBerechnen(karte, marker) {
+    var kartenGroesse = karte.getSize();
     var punkt = karte.latLngToContainerPoint(marker.getLatLng());
-    var rechts = punkt.x < kartenBreite / 2;
-    popup.update();
-    var breite = element.offsetWidth;
-    var offsetX = rechts ? breite / 2 + POPUP_ABSTAND : -(breite / 2 + POPUP_ABSTAND);
+    var randPuffer = 16;
 
-    popup.options.offset = L.point(offsetX, -14);
-    popup.update();
+    var platzRechts = kartenGroesse.x - punkt.x - randPuffer;
+    var platzLinks = punkt.x - randPuffer;
+    var rechts = platzRechts >= platzLinks;
+    var verfuegbareBreite = Math.max(platzRechts, platzLinks) - POPUP_ABSTAND;
+
+    // Nie mehr verlangen als tatsächlich verfügbar ist (sonst Clipping durch overflow:hidden
+    // am Kartenrand) – 200px als unterste, noch nutzbare Grenze für sehr schmale Screens.
+    var maxBreite = Math.min(600, Math.max(200, verfuegbareBreite));
+    var minBreite = Math.min(200, maxBreite);
+
+    // Der Kartencontainer schneidet alles ab, was über seine Oberkante hinausragt (overflow: hidden).
+    // Da das Popup von der Pin-Position aus nach oben wächst, darf es nie höher sein als der Platz
+    // zwischen Pin und Kartenoberkante – sonst landen Inhalt und Schließen-Button im unsichtbaren,
+    // nicht klickbaren Bereich.
+    var platzOben = punkt.y - 60;
+    var maxHoehe = Math.max(160, Math.min(kartenGroesse.y - 96, platzOben));
+
+    var offsetX = rechts ? maxBreite / 2 + POPUP_ABSTAND : -(maxBreite / 2 + POPUP_ABSTAND);
+
+    return {
+      maxWidth: maxBreite,
+      minWidth: minBreite,
+      maxHeight: maxHoehe,
+      offset: L.point(offsetX, -14)
+    };
   }
 
   function ladeSpiele(karte, emptyStateEl) {
@@ -160,10 +174,47 @@
             return;
           }
           var marker = L.marker([spiel.koordinaten.lat, spiel.koordinaten.lng]).addTo(karte);
-          marker.bindPopup(popupHtml(spiel), { maxWidth: 600, minWidth: 320, className: "popup-card" });
-          marker.on("popupopen", function (e) {
-            popupSeiteAnwenden(karte, marker, e.popup);
+          var popup = L.popup({ className: "popup-card", autoPan: false }).setContent(popupHtml(spiel));
+
+          // Maße VOR dem ersten Öffnen setzen (nicht erst im popupopen-Event), damit Leaflet
+          // beim Öffnen direkt mit den richtigen Werten rechnet statt erst mit Standardmaßen
+          // zu öffnen und danach zu korrigieren.
+          marker.on("click", function () {
+            var optionen = popupOptionenBerechnen(karte, marker);
+            popup.options.maxWidth = optionen.maxWidth;
+            popup.options.minWidth = optionen.minWidth;
+            popup.options.maxHeight = optionen.maxHeight;
+            popup.options.offset = optionen.offset;
           });
+
+          // Der Kartencontainer schneidet alles oberhalb seiner eigenen Oberkante ab
+          // (overflow: hidden). Die Schätzung in popupOptionenBerechnen ist bewusst grob,
+          // deshalb hier einmalig anhand der tatsächlich gerenderten Position nachkorrigieren.
+          // autoPan ist deaktiviert, ein zweiter update()-Aufruf verschiebt die Karte also nicht.
+          marker.on("popupopen", function () {
+            var element = popup.getElement();
+            if (!element) return;
+
+            var kartenRect = karte.getContainer().getBoundingClientRect();
+            var popupRect = element.getBoundingClientRect();
+            var ueberstand = kartenRect.top - popupRect.top;
+            if (ueberstand > 0) {
+              // maxHeight wirkt nur auf den inneren Content-Bereich, nicht auf die ganze Card
+              // (die durch Padding/Ränder ca. 25-30px größer ist) – deshalb hier vom bisherigen
+              // maxHeight-Wert abziehen, nicht von der gemessenen Gesamthöhe der Card.
+              popup.options.maxHeight = Math.max(140, popup.options.maxHeight - ueberstand - 8);
+              popup.update();
+            }
+
+            // Erst NACH dem letzten update()-Aufruf setzen: update() rendert den Inhalt aus dem
+            // ursprünglichen HTML-String neu und würde eine vorher gesetzte Klasse wieder verwerfen.
+            var inhaltEl = element.querySelector(".popup-content");
+            if (inhaltEl) {
+              inhaltEl.classList.toggle("popup-schmal", popup.options.maxWidth < 260);
+            }
+          });
+
+          marker.bindPopup(popup);
         });
       })
       .catch(function (err) {
