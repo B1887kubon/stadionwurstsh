@@ -66,7 +66,11 @@
       .catch(function (err) {
         console.error(err);
         if (emptyStateEl) {
-          emptyStateEl.textContent = "Karte konnte nicht geladen werden.";
+          var hinweis =
+            window.location.protocol === "file:"
+              ? "Diese Seite muss über einen lokalen Server aufgerufen werden (z.B. npx serve . oder python -m http.server), nicht per Doppelklick geöffnet. Siehe README."
+              : "Spiele konnten nicht geladen werden.";
+          emptyStateEl.textContent = hinweis;
           emptyStateEl.style.display = "block";
         }
       });
