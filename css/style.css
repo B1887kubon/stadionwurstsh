@@ -140,15 +140,115 @@ a:hover {
 }
 
 /* Popup content */
-.popup-content h3 {
-  margin: 0 0 0.25rem;
+.popup-content {
+  width: 100%;
+}
+
+.popup-team {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.popup-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.popup-logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+}
+
+.popup-team-info h3 {
+  margin: 0;
   font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.popup-vs {
+  margin: 0.1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }
 
 .popup-liga {
   color: var(--color-text-muted);
   font-size: 0.85rem;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.25rem;
+}
+
+.popup-adresse {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin: 0 0 0.6rem;
+}
+
+.popup-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 0 0 0.6rem;
+}
+
+.popup-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border: 2px dashed var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.popup-image-placeholder span:first-child {
+  font-size: 1.4rem;
+  opacity: 0.6;
+}
+
+.popup-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.popup-fact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.popup-fact-label {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.popup-fact-value {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.popup-fact-gesamt .popup-fact-value {
+  color: var(--color-accent);
 }
 
 .popup-bbl {

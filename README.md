@@ -28,10 +28,16 @@ Alle Spiele stehen in [`data/spiele.json`](data/spiele.json) als Array von Objek
 {
   "id": "eindeutige-id",
   "verein_heim": "SV Beispiel",
+  "verein_gast": "FC Gegner",
+  "verein_heim_logo": "",
+  "bild": "",
   "ort": "Musterstadt",
   "liga": "Kreisklasse C",
+  "stadion_adresse": "Sportplatzweg 1, 24103 Musterstadt",
   "koordinaten": { "lat": 54.32, "lng": 10.13 },
   "datum": "2026-07-19",
+  "ergebnis": "3:2",
+  "eintrittspreis": "5,00 €",
   "bbl_bratwurst": 4,
   "bbl_bier": 3,
   "bbl_limo": 5,
@@ -43,10 +49,16 @@ Alle Spiele stehen in [`data/spiele.json`](data/spiele.json) als Array von Objek
 Felder:
 
 - `id` – eindeutiger String zur Identifikation
-- `verein_heim`, `ort`, `liga` – Vereinsname, Spielort, Liga
+- `verein_heim`, `verein_gast` – Heim- und Gastverein
+- `verein_heim_logo` – optional, Pfad/URL zu einem Vereinslogo (z.B. `assets/vereine/sv-beispiel.png`). Leer lassen, solange kein Logo vorliegt, dann zeigt die Karte einen Platzhalter mit dem Anfangsbuchstaben
+- `bild` – optional, Pfad/URL zu einem Foto vom Spieltag. Leer lassen, solange kein Foto vorliegt, dann zeigt die Karte einen Platzhalter
+- `ort`, `liga` – Spielort, Liga
+- `stadion_adresse` – optional, Adresse des Stadions
 - `koordinaten.lat` / `koordinaten.lng` – Standort des Stadions (z.B. via [openstreetmap.org](https://www.openstreetmap.org) ermitteln)
 - `datum` – ISO-Format `YYYY-MM-DD`
-- `bbl_bratwurst`, `bbl_bier`, `bbl_limo` – Bewertung von 1 bis 5
+- `ergebnis` – optional, Endstand, z.B. `"3:2"`
+- `eintrittspreis` – optional, z.B. `"5,00 €"`
+- `bbl_bratwurst`, `bbl_bier`, `bbl_limo` – Bewertung von 1 bis 5. Aus diesen drei Werten berechnet die Karte automatisch die Gesamtbewertung
 - `kommentar` – optionaler Freitext
 - `youtube_url` – optional, leer lassen, solange das Video noch nicht online ist
 
