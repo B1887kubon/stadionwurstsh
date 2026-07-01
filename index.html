@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stadionwurstkarte SH</title>
+  <meta name="description" content="Die Stadionwurstkarte Schleswig-Holstein: Amateurfußball-Heimspiele im BBL-Check (Bratwurst, Bier, Limo)." />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-logo" href="index.html">Stadionwurst<span>karte SH</span></a>
+    <nav class="site-nav">
+      <a href="index.html" aria-current="page">Karte</a>
+      <a href="ueber.html">Über das Projekt</a>
+      <a href="impressum.html">Impressum</a>
+    </nav>
+  </header>
+
+  <section class="intro">
+    <h1>Die Stadionwurstkarte Schleswig-Holstein</h1>
+    <!-- TODO: Platzhaltertext ersetzen -->
+    <p>
+      Vater und Sohn ziehen durch Schleswig-Holstein, von der Kreisklasse C bis zur Oberliga,
+      und unterziehen jedes Heimspiel dem BBL-Check: Bratwurst, Bier, Limo. Jeder Pin auf dieser
+      Karte steht für ein Stadion, das wir besucht haben – mit Bewertung und Video.
+    </p>
+  </section>
+
+  <main class="map-wrapper">
+    <div id="empty-state" class="empty-state" style="display: none;">
+      Noch keine Spiele – der erste Pin kommt am 19.7.
+    </div>
+    <div id="karte"></div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="impressum.html">Impressum</a>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/karte.js"></script>
+</body>
+</html>
