@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "test-001",
+    "verein_heim": "SV Testverein",
+    "ort": "Kiel",
+    "liga": "Kreisklasse C",
+    "koordinaten": { "lat": 54.3233, "lng": 10.1228 },
+    "datum": "2026-07-19",
+    "bbl_bratwurst": 4,
+    "bbl_bier": 3,
+    "bbl_limo": 5,
+    "kommentar": "Testeintrag, um Design und Popup-Inhalte zu prüfen. Kann später gelöscht werden.",
+    "youtube_url": ""
+  }
+]
