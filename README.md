@@ -78,3 +78,15 @@ data/spiele.json      Datenbank aller Spiele (manuell gepflegt)
 ## Deployment
 
 Die Seite ist als statisches Projekt für GitHub Pages vorbereitet. Im Repo unter *Settings → Pages* den Branch (z.B. `main`) und das Root-Verzeichnis (`/`) als Quelle einstellen.
+
+## SEO: Platzhalter-Domain ersetzen
+
+Für Canonical-Links, Open-Graph-Tags, `robots.txt` und `sitemap.xml` wird aktuell die Platzhalter-Domain `https://stadionwurstkarte-sh.example` verwendet (`.example` ist eine für Beispiele reservierte Domain-Endung, funktioniert also nirgendwo echt). Sobald die Seite unter einer echten Domain läuft, dort per Suchen & Ersetzen `stadionwurstkarte-sh.example` durch die eigene Domain ersetzen in:
+
+- `index.html`, `ueber.html`, `impressum.html` (jeweils `<link rel="canonical">`, `og:*`- und `twitter:*`-Tags)
+- `robots.txt` (Sitemap-Zeile)
+- `sitemap.xml` (alle `<loc>`-Einträge)
+
+Die `impressum.html` ist bewusst mit `<meta name="robots" content="noindex, follow">` markiert und taucht deshalb nicht in `sitemap.xml` auf – das ist für Impressum-Seiten üblich.
+
+Das Social-Media-Vorschaubild liegt unter `assets/og-image.png` (1200×630px) und muss bei einer Änderung von Logo/Design manuell neu erstellt werden.

@@ -11,6 +11,13 @@
     return voll + leer;
   }
 
+  function bblFarbKlasse(wert) {
+    var gerundet = Math.round(wert) || 0;
+    if (gerundet <= 1) return "popup-bbl-rot";
+    if (gerundet <= 3) return "popup-bbl-gelb";
+    return "popup-bbl-gruen";
+  }
+
   function formatDatum(isoDatum) {
     if (!isoDatum) return "";
     var d = new Date(isoDatum);
@@ -72,7 +79,7 @@
     var gesamt = gesamtbewertung(spiel);
     var gesamtHtml =
       gesamt !== null
-        ? '<div class="popup-bbl-item popup-bbl-gesamt"><span class="popup-bbl-label">Gesamt</span><span class="popup-bbl-dots">' + bblBalken(gesamt) + "</span></div>"
+        ? '<div class="popup-bbl-item popup-bbl-gesamt ' + bblFarbKlasse(gesamt) + '"><span class="popup-bbl-label">Gesamt</span><span class="popup-bbl-dots">' + bblBalken(gesamt) + "</span></div>"
         : "";
 
     var video = spiel.youtube_url
@@ -101,9 +108,9 @@
       "</div>" +
       "</div>" +
       '<div class="popup-bbl">' +
-      '<div class="popup-bbl-item popup-bbl-bratwurst"><span class="popup-bbl-label">Bratwurst</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_bratwurst) + "</span></div>" +
-      '<div class="popup-bbl-item popup-bbl-bier"><span class="popup-bbl-label">Bier</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_bier) + "</span></div>" +
-      '<div class="popup-bbl-item popup-bbl-limo"><span class="popup-bbl-label">Limo</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_limo) + "</span></div>" +
+      '<div class="popup-bbl-item ' + bblFarbKlasse(spiel.bbl_bratwurst) + '"><span class="popup-bbl-label">Bratwurst</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_bratwurst) + "</span></div>" +
+      '<div class="popup-bbl-item ' + bblFarbKlasse(spiel.bbl_bier) + '"><span class="popup-bbl-label">Bier</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_bier) + "</span></div>" +
+      '<div class="popup-bbl-item ' + bblFarbKlasse(spiel.bbl_limo) + '"><span class="popup-bbl-label">Limo</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_limo) + "</span></div>" +
       gesamtHtml +
       "</div>" +
       kommentar +
@@ -119,7 +126,7 @@
     var kartenBreite = karte.getSize().x;
 
     // Breite an den verfügbaren Platz anpassen, damit die Card auf dem Handy nicht über den Rand hinausragt
-    var maxBreite = Math.min(440, Math.max(260, kartenBreite - 64));
+    var maxBreite = Math.min(600, Math.max(260, kartenBreite - 64));
     var minBreite = Math.min(320, maxBreite);
     popup.options.maxWidth = maxBreite;
     popup.options.minWidth = minBreite;
@@ -132,17 +139,6 @@
 
     popup.options.offset = L.point(offsetX, -14);
     popup.update();
-    element.classList.toggle("popup-links", !rechts);
-    element.classList.toggle("popup-rechts", rechts);
-
-    // Pfeil auf die tatsächliche Höhe des Pins ausrichten, nicht auf die Mitte der Card
-    var kartenRect = karte.getContainer().getBoundingClientRect();
-    var popupRect = element.getBoundingClientRect();
-    var pinY = kartenRect.top + punkt.y;
-    var pfeilY = pinY - popupRect.top;
-    var rand = 16;
-    pfeilY = Math.max(rand, Math.min(popupRect.height - rand, pfeilY));
-    element.style.setProperty("--popup-pfeil-top", pfeilY + "px");
   }
 
   function ladeSpiele(karte, emptyStateEl) {
@@ -164,7 +160,7 @@
             return;
           }
           var marker = L.marker([spiel.koordinaten.lat, spiel.koordinaten.lng]).addTo(karte);
-          marker.bindPopup(popupHtml(spiel), { maxWidth: 440, minWidth: 320, className: "popup-card" });
+          marker.bindPopup(popupHtml(spiel), { maxWidth: 600, minWidth: 320, className: "popup-card" });
           marker.on("popupopen", function (e) {
             popupSeiteAnwenden(karte, marker, e.popup);
           });
@@ -187,7 +183,11 @@
     var kartenEl = document.getElementById("karte");
     if (!kartenEl) return;
 
-    var karte = L.map("karte").setView(KARTE_MITTE, KARTE_ZOOM);
+    var reduzierteBewegung = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var karte = L.map("karte", {
+      zoomAnimation: !reduzierteBewegung,
+      fadeAnimation: !reduzierteBewegung
+    }).setView(KARTE_MITTE, KARTE_ZOOM);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
