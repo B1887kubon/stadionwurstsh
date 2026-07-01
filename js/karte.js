@@ -2,10 +2,12 @@
 (function () {
   var KARTE_MITTE = [54.3, 9.8]; // grober Mittelpunkt Schleswig-Holstein/Hamburg
   var KARTE_ZOOM = 8;
+  var POPUP_ABSTAND = 16; // Lücke zwischen Pin und Popup in px
 
   function bblBalken(wert) {
-    var voll = "●".repeat(wert);
-    var leer = "○".repeat(5 - wert);
+    var gerundet = Math.round(wert) || 0;
+    var voll = "●".repeat(gerundet);
+    var leer = "○".repeat(5 - gerundet);
     return voll + leer;
   }
 
@@ -46,18 +48,10 @@
 
     var fakten = [];
     if (spiel.ergebnis) {
-      fakten.push({ label: "Ergebnis", value: spiel.ergebnis, klasse: "" });
+      fakten.push({ label: "Ergebnis", value: spiel.ergebnis });
     }
     if (spiel.eintrittspreis) {
-      fakten.push({ label: "Eintritt", value: spiel.eintrittspreis, klasse: "" });
-    }
-    var gesamt = gesamtbewertung(spiel);
-    if (gesamt !== null) {
-      fakten.push({
-        label: "Gesamt",
-        value: gesamt.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " / 5",
-        klasse: "popup-fact-gesamt"
-      });
+      fakten.push({ label: "Eintritt", value: spiel.eintrittspreis });
     }
 
     var faktenHtml = fakten.length
@@ -65,7 +59,7 @@
         fakten
           .map(function (f) {
             return (
-              '<div class="popup-fact ' + f.klasse + '">' +
+              '<div class="popup-fact">' +
               '<span class="popup-fact-label">' + f.label + "</span>" +
               '<span class="popup-fact-value">' + f.value + "</span>" +
               "</div>"
@@ -74,6 +68,12 @@
           .join("") +
         "</div>"
       : "";
+
+    var gesamt = gesamtbewertung(spiel);
+    var gesamtHtml =
+      gesamt !== null
+        ? '<div class="popup-bbl-item popup-bbl-gesamt"><span class="popup-bbl-label">Gesamt</span>' + bblBalken(gesamt) + "</div>"
+        : "";
 
     var video = spiel.youtube_url
       ? '<a class="popup-video" href="' + spiel.youtube_url + '" target="_blank" rel="noopener">Video ansehen ▶</a>'
@@ -85,26 +85,47 @@
 
     return (
       '<div class="popup-content">' +
-      '<div class="popup-team">' +
+      '<div class="popup-header">' +
+      '<div class="popup-identity">' +
+      '<div class="popup-team-name-row">' +
       logo +
-      '<div class="popup-team-info">' +
       "<h3>" + spiel.verein_heim + "</h3>" +
+      "</div>" +
       gegner +
-      "</div>" +
-      "</div>" +
       '<p class="popup-liga">' + spiel.liga + " &middot; " + spiel.ort + " &middot; " + formatDatum(spiel.datum) + "</p>" +
       adresse +
-      bild +
+      "</div>" +
+      '<div class="popup-side">' +
       faktenHtml +
+      bild +
+      "</div>" +
+      "</div>" +
       '<div class="popup-bbl">' +
       '<div class="popup-bbl-item"><span class="popup-bbl-label">Bratwurst</span>' + bblBalken(spiel.bbl_bratwurst) + "</div>" +
       '<div class="popup-bbl-item"><span class="popup-bbl-label">Bier</span>' + bblBalken(spiel.bbl_bier) + "</div>" +
       '<div class="popup-bbl-item"><span class="popup-bbl-label">Limo</span>' + bblBalken(spiel.bbl_limo) + "</div>" +
+      gesamtHtml +
       "</div>" +
       kommentar +
       video +
       "</div>"
     );
+  }
+
+  function popupSeiteAnwenden(karte, marker, popup) {
+    var element = popup.getElement();
+    if (!element) return;
+
+    var punkt = karte.latLngToContainerPoint(marker.getLatLng());
+    var kartenBreite = karte.getSize().x;
+    var rechts = punkt.x < kartenBreite / 2;
+    var breite = element.offsetWidth;
+    var offsetX = rechts ? breite / 2 + POPUP_ABSTAND : -(breite / 2 + POPUP_ABSTAND);
+
+    popup.options.offset = L.point(offsetX, -14);
+    popup.update();
+    element.classList.toggle("popup-links", !rechts);
+    element.classList.toggle("popup-rechts", rechts);
   }
 
   function ladeSpiele(karte, emptyStateEl) {
@@ -125,9 +146,11 @@
           if (!spiel.koordinaten || typeof spiel.koordinaten.lat !== "number" || typeof spiel.koordinaten.lng !== "number") {
             return;
           }
-          L.marker([spiel.koordinaten.lat, spiel.koordinaten.lng])
-            .addTo(karte)
-            .bindPopup(popupHtml(spiel), { maxWidth: 300, minWidth: 260 });
+          var marker = L.marker([spiel.koordinaten.lat, spiel.koordinaten.lng]).addTo(karte);
+          marker.bindPopup(popupHtml(spiel), { maxWidth: 360, minWidth: 280, className: "popup-card" });
+          marker.on("popupopen", function (e) {
+            popupSeiteAnwenden(karte, marker, e.popup);
+          });
         });
       })
       .catch(function (err) {
