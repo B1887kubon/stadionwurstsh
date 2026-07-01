@@ -72,12 +72,12 @@
     var gesamt = gesamtbewertung(spiel);
     var gesamtHtml =
       gesamt !== null
-        ? '<div class="popup-bbl-item popup-bbl-gesamt"><span class="popup-bbl-label">Gesamt</span>' + bblBalken(gesamt) + "</div>"
+        ? '<div class="popup-bbl-item popup-bbl-gesamt"><span class="popup-bbl-label">Gesamt</span><span class="popup-bbl-dots">' + bblBalken(gesamt) + "</span></div>"
         : "";
 
     var video = spiel.youtube_url
       ? '<a class="popup-video" href="' + spiel.youtube_url + '" target="_blank" rel="noopener">Video ansehen ▶</a>'
-      : '<span class="popup-video" style="color:#6b625c;">Video folgt in Kürze</span>';
+      : '<span class="popup-video popup-video-muted">Video folgt in Kürze</span>';
 
     var kommentar = spiel.kommentar
       ? '<p class="popup-kommentar">' + spiel.kommentar + "</p>"
@@ -101,9 +101,9 @@
       "</div>" +
       "</div>" +
       '<div class="popup-bbl">' +
-      '<div class="popup-bbl-item"><span class="popup-bbl-label">Bratwurst</span>' + bblBalken(spiel.bbl_bratwurst) + "</div>" +
-      '<div class="popup-bbl-item"><span class="popup-bbl-label">Bier</span>' + bblBalken(spiel.bbl_bier) + "</div>" +
-      '<div class="popup-bbl-item"><span class="popup-bbl-label">Limo</span>' + bblBalken(spiel.bbl_limo) + "</div>" +
+      '<div class="popup-bbl-item popup-bbl-bratwurst"><span class="popup-bbl-label">Bratwurst</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_bratwurst) + "</span></div>" +
+      '<div class="popup-bbl-item popup-bbl-bier"><span class="popup-bbl-label">Bier</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_bier) + "</span></div>" +
+      '<div class="popup-bbl-item popup-bbl-limo"><span class="popup-bbl-label">Limo</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_limo) + "</span></div>" +
       gesamtHtml +
       "</div>" +
       kommentar +
@@ -116,9 +116,17 @@
     var element = popup.getElement();
     if (!element) return;
 
-    var punkt = karte.latLngToContainerPoint(marker.getLatLng());
     var kartenBreite = karte.getSize().x;
+
+    // Breite an den verfügbaren Platz anpassen, damit die Card auf dem Handy nicht über den Rand hinausragt
+    var maxBreite = Math.min(440, Math.max(260, kartenBreite - 64));
+    var minBreite = Math.min(320, maxBreite);
+    popup.options.maxWidth = maxBreite;
+    popup.options.minWidth = minBreite;
+
+    var punkt = karte.latLngToContainerPoint(marker.getLatLng());
     var rechts = punkt.x < kartenBreite / 2;
+    popup.update();
     var breite = element.offsetWidth;
     var offsetX = rechts ? breite / 2 + POPUP_ABSTAND : -(breite / 2 + POPUP_ABSTAND);
 
@@ -126,6 +134,15 @@
     popup.update();
     element.classList.toggle("popup-links", !rechts);
     element.classList.toggle("popup-rechts", rechts);
+
+    // Pfeil auf die tatsächliche Höhe des Pins ausrichten, nicht auf die Mitte der Card
+    var kartenRect = karte.getContainer().getBoundingClientRect();
+    var popupRect = element.getBoundingClientRect();
+    var pinY = kartenRect.top + punkt.y;
+    var pfeilY = pinY - popupRect.top;
+    var rand = 16;
+    pfeilY = Math.max(rand, Math.min(popupRect.height - rand, pfeilY));
+    element.style.setProperty("--popup-pfeil-top", pfeilY + "px");
   }
 
   function ladeSpiele(karte, emptyStateEl) {
@@ -147,7 +164,7 @@
             return;
           }
           var marker = L.marker([spiel.koordinaten.lat, spiel.koordinaten.lng]).addTo(karte);
-          marker.bindPopup(popupHtml(spiel), { maxWidth: 360, minWidth: 280, className: "popup-card" });
+          marker.bindPopup(popupHtml(spiel), { maxWidth: 440, minWidth: 320, className: "popup-card" });
           marker.on("popupopen", function (e) {
             popupSeiteAnwenden(karte, marker, e.popup);
           });
