@@ -550,6 +550,44 @@ a:hover {
   right: 8px !important;
 }
 
+/* Kleiner Hinweis, dass sich der Popup-Inhalt scrollen lässt – sonst auf dem Handy nicht
+   erkennbar. Verschwindet, sobald man zu scrollen anfängt (siehe scrollHinweisAktualisieren
+   in karte.js). */
+.popup-scroll-hinweis {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-ink);
+  color: var(--color-cream);
+  font-size: 13px;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+  animation: popup-scroll-bounce 1.4s ease-in-out infinite;
+}
+
+.popup-scroll-hinweis.ist-versteckt {
+  opacity: 0;
+}
+
+@keyframes popup-scroll-bounce {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(4px);
+  }
+}
+
 /* Generic content pages */
 .page-content {
   max-width: 720px;
@@ -603,6 +641,25 @@ a:hover {
   height: auto;
   border-radius: 10px;
   margin: 1rem 0 1.5rem;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.cta-button:hover {
+  background: var(--color-accent-dark);
+  color: #fff;
 }
 
 /* Footer */
@@ -731,4 +788,102 @@ a:hover {
 
 .lightbox-close:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* Cookie-Consent-Banner */
+.cookie-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2500;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem max(1.25rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom))
+    max(1.25rem, env(safe-area-inset-left));
+  background: var(--color-ink);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cookie-banner-text {
+  flex: 1 1 260px;
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(245, 241, 230, 0.85);
+}
+
+.cookie-banner-text a {
+  color: var(--color-gold);
+}
+
+.cookie-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.cookie-banner-btn {
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.cookie-banner-btn-primaer {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.cookie-banner-btn-primaer:hover {
+  background: var(--color-accent-dark);
+}
+
+.cookie-banner-btn-sekundaer {
+  background: transparent;
+  border-color: rgba(245, 241, 230, 0.4);
+  color: var(--color-cream);
+}
+
+.cookie-banner-btn-sekundaer:hover {
+  background: var(--color-ink-light);
+}
+
+@media (max-width: 560px) {
+  .cookie-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cookie-banner-text {
+    flex-basis: auto;
+  }
+
+  .cookie-banner-actions {
+    justify-content: stretch;
+  }
+
+  .cookie-banner-btn {
+    flex: 1 1 0;
+    text-align: center;
+  }
+}
+
+/* Footer-Link, der wie ein Link aussieht, aber ein <button> ist (löst JS aus, statt zu navigieren) */
+.site-footer .footer-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-gold);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.site-footer .footer-link-button:hover {
+  color: var(--color-cream);
 }

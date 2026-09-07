@@ -51,14 +51,12 @@
       <a href="index.html" aria-current="page">Karte</a>
       <a href="ueber.html">Über das Projekt</a>
       <a href="impressum.html">Impressum</a>
+      <a href="datenschutz.html">Datenschutz</a>
     </nav>
   </header>
 
   <section class="intro">
     <h1>Die Stadionwurstkarte Schleswig-Holstein</h1>
-    <!-- TODO: Platzhaltertext ersetzen -->
-    <!-- Kurzfassung: nur auf schmalen Screens sichtbar, damit oberhalb der Karte weniger Platz
-         verloren geht. Ab Tablet-Breite wird stattdessen der ausführliche Text angezeigt. -->
     <p class="intro-text intro-text--kurz">
       Amateurfußball-Heimspiele in Schleswig-Holstein im BBL-Check: Bratwurst, Bier, Limo.
     </p>
@@ -78,11 +76,13 @@
   </main>
 
   <footer class="site-footer">
-    <a href="impressum.html">Impressum</a>
+    <a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a> ·
+    <button type="button" id="cookie-einstellungen-link" class="footer-link-button">Cookie-Einstellungen</button>
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="js/karte.js"></script>
   <script src="js/nav.js"></script>
+  <script src="js/cookie-consent.js"></script>
 </body>
 </html>

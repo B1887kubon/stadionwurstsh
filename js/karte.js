@@ -227,6 +227,37 @@
               popup.options.maxHeight = Math.max(140, popup.options.maxHeight - ueberstand - 8);
               popup.update();
             }
+
+            scrollHinweisAktualisieren(element);
+          }
+
+          // Zeigt einen kleinen, pulsierenden Pfeil am unteren Kartenrand der Card, sobald ihr
+          // Inhalt tatsächlich scrollbar ist – ohne das ist auf dem Handy nicht erkennbar, dass
+          // unter den Pins noch mehr Inhalt folgt. Verschwindet, sobald man zu scrollen anfängt.
+          function scrollHinweisAktualisieren(element) {
+            var inhalt = element.querySelector(".leaflet-popup-content");
+            var wrapper = element.querySelector(".leaflet-popup-content-wrapper");
+            if (!inhalt || !wrapper) return;
+
+            var istScrollbar = inhalt.scrollHeight > inhalt.clientHeight + 1;
+            var hinweis = wrapper.querySelector(".popup-scroll-hinweis");
+
+            if (!istScrollbar) {
+              if (hinweis) hinweis.remove();
+              return;
+            }
+
+            if (!hinweis) {
+              hinweis = document.createElement("div");
+              hinweis.className = "popup-scroll-hinweis";
+              hinweis.setAttribute("aria-hidden", "true");
+              hinweis.textContent = "▾";
+              wrapper.appendChild(hinweis);
+
+              inhalt.addEventListener("scroll", function () {
+                hinweis.classList.toggle("ist-versteckt", inhalt.scrollTop > 8);
+              });
+            }
           }
 
           marker.on("popupopen", function () {
