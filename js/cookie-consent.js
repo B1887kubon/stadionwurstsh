@@ -45,9 +45,10 @@
     banner.setAttribute("role", "dialog");
     banner.setAttribute("aria-label", "Cookie-Einstellungen");
     banner.innerHTML =
+      '<p class="cookie-banner-title">🍪 Cookies &amp; Co.</p>' +
       '<p class="cookie-banner-text">' +
-      "Wir nutzen Google Analytics zur anonymen Reichweitenmessung. Das Tracking startet nur, " +
-      "wenn Sie zustimmen. " +
+      "Wir würden gern Google Analytics nutzen, um zu sehen, wie die Karte ankommt. Das " +
+      "Tracking startet nur, wenn du zustimmst. " +
       '<a href="datenschutz.html">Mehr in der Datenschutzerklärung</a>.' +
       "</p>" +
       '<div class="cookie-banner-actions">' +

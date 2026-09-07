@@ -799,29 +799,34 @@ body.cookie-banner-sichtbar #karte {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Cookie-Consent-Banner */
+/* Cookie-Consent-Banner: schwebende Karte mit Abstand zum Rand statt vollflächiger Leiste */
 .cookie-banner {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 1rem;
+  right: 1rem;
+  bottom: max(1rem, env(safe-area-inset-bottom));
   z-index: 2500;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem max(1.25rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom))
-    max(1.25rem, env(safe-area-inset-left));
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.15rem 1.3rem;
+  border-radius: 16px;
   background: var(--color-ink);
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.cookie-banner-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-cream);
 }
 
 .cookie-banner-text {
-  flex: 1 1 260px;
   margin: 0;
-  font-size: 0.9rem;
-  color: rgba(245, 241, 230, 0.85);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(245, 241, 230, 0.8);
 }
 
 .cookie-banner-text a {
@@ -830,16 +835,18 @@ body.cookie-banner-sichtbar #karte {
 
 .cookie-banner-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.6rem;
+  margin-top: 0.3rem;
 }
 
 .cookie-banner-btn {
-  padding: 0.55rem 1.1rem;
+  flex: 1 1 0;
+  padding: 0.6rem 1rem;
   border-radius: 999px;
   border: 1px solid transparent;
   font-weight: 600;
   font-size: 0.85rem;
+  text-align: center;
   cursor: pointer;
 }
 
@@ -862,23 +869,12 @@ body.cookie-banner-sichtbar #karte {
   background: var(--color-ink-light);
 }
 
-@media (max-width: 560px) {
+@media (min-width: 560px) {
   .cookie-banner {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .cookie-banner-text {
-    flex-basis: auto;
-  }
-
-  .cookie-banner-actions {
-    justify-content: stretch;
-  }
-
-  .cookie-banner-btn {
-    flex: 1 1 0;
-    text-align: center;
+    left: auto;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    width: 380px;
   }
 }
 
