@@ -48,6 +48,10 @@ body {
   min-height: 100vh;
 }
 
+body.lightbox-aktiv {
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -72,8 +76,8 @@ a:hover {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;
-  padding: 0.85rem max(1.25rem, env(safe-area-inset-right)) 0.85rem max(1.25rem, env(safe-area-inset-left));
-  padding-top: max(0.85rem, env(safe-area-inset-top));
+  padding: 0.55rem max(1.25rem, env(safe-area-inset-right)) 0.55rem max(1.25rem, env(safe-area-inset-left));
+  padding-top: max(0.55rem, env(safe-area-inset-top));
   background: var(--color-ink);
   border-bottom: 3px solid var(--color-gold);
   position: sticky;
@@ -125,39 +129,123 @@ a:hover {
   background: var(--color-ink-light);
 }
 
+/* Burger-Button: nur auf schmalen Screens sichtbar */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-toggle:hover {
+  background: var(--color-ink-light);
+}
+
+.nav-toggle-icon,
+.nav-toggle-icon::before,
+.nav-toggle-icon::after {
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-cream);
+}
+
+.nav-toggle-icon {
+  position: relative;
+  display: block;
+}
+
+.nav-toggle-icon::before,
+.nav-toggle-icon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease, top 0.2s ease;
+}
+
+.nav-toggle-icon::before {
+  top: -7px;
+}
+
+.nav-toggle-icon::after {
+  top: 7px;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon {
+  background: transparent;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
 @media (max-width: 560px) {
+  .nav-toggle {
+    display: inline-flex;
+  }
+
   .site-nav {
-    width: 100%;
-    justify-content: space-between;
-    gap: 0.25rem;
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 0.5rem max(1.25rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-bottom));
+    background: var(--color-ink);
+    border-bottom: 3px solid var(--color-gold);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .site-nav.ist-offen {
+    display: flex;
   }
 
   .site-nav a {
-    flex: 1 1 0;
-    justify-content: center;
-    text-align: center;
-    padding-left: 0.4rem;
-    padding-right: 0.4rem;
+    width: 100%;
+    justify-content: flex-start;
+    min-height: 48px;
   }
 }
 
 /* Intro */
 .intro {
   max-width: 780px;
-  margin: 1.25rem auto 0;
+  margin: 0.75rem auto 0;
   padding: 0 1.25rem;
   text-align: center;
 }
 
 .intro h1 {
-  font-size: clamp(1.35rem, 1.05rem + 2vw, 2rem);
-  margin: 0 0 0.5rem;
+  font-size: clamp(1.2rem, 1rem + 2vw, 2rem);
+  margin: 0 0 0.35rem;
 }
 
-.intro p {
+.intro-text {
   color: var(--color-text-muted);
   font-size: clamp(0.95rem, 0.88rem + 0.4vw, 1.05rem);
   margin: 0;
+}
+
+/* Kurzfassung ist der mobile Standard, die ausführliche Fassung blendet erst ab Tablet-Breite
+   ein (siehe @media (min-width: 600px) weiter unten) – spart auf schmalen Screens Platz
+   oberhalb der Karte. */
+.intro-text--lang {
+  display: none;
 }
 
 /* Map */
@@ -166,7 +254,7 @@ a:hover {
   z-index: 1;
   flex: 1 1 auto;
   min-height: 70vh;
-  margin: 1.25rem 0 0;
+  margin: 0.75rem 0 0;
 }
 
 #karte {
@@ -201,58 +289,24 @@ a:hover {
   word-break: break-word;
 }
 
-/* Wird per JS gesetzt, wenn neben dem Pin wenig Platz ist (siehe popupOptionenBerechnen in
-   karte.js) – Spalten stapeln statt sie unleserlich zusammenzuquetschen. Eine CSS-Container-Query
-   wäre hier die naheliegende Wahl, kollidiert aber mit Leaflets eigener Breitenmessung
-   (container-type: inline-size verhindert, dass die natürliche Inhaltsbreite nach oben
-   durchgereicht wird), deshalb die Klasse direkt anhand der ohnehin berechneten Zielbreite. */
-.popup-content.popup-schmal .popup-header {
-  flex-direction: column;
-}
-
-.popup-content.popup-schmal .popup-facts {
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.popup-content.popup-schmal .popup-fact {
-  flex-direction: row;
+.popup-top {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  text-align: left;
-}
-
-.popup-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.popup-identity {
-  flex: 1 1 60%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.popup-side {
-  flex: 1 1 40%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .popup-team-name-row {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.6rem;
+  min-width: 0;
 }
 
 .popup-logo {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: contain;
   background: var(--color-bg);
@@ -287,63 +341,83 @@ a:hover {
 .popup-content .popup-liga {
   color: var(--color-text-muted);
   font-size: 0.85rem;
-  margin: 0.3rem 0 0;
+  margin: 0.25rem 0 0;
 }
 
 .popup-content .popup-adresse {
   color: var(--color-text-muted);
   font-size: 0.85rem;
-  margin: 0.2rem 0 0;
+  margin: 0.1rem 0 0;
 }
 
-.popup-image {
+.popup-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin: 0.4rem 0 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.popup-identity {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.popup-side {
+  flex-shrink: 0;
+}
+
+.popup-image-thumb-btn {
+  display: block;
+  width: 110px;
+  height: 110px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: none;
+  cursor: zoom-in;
+}
+
+.popup-image-thumb {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: 100%;
   object-fit: cover;
-  border-radius: 8px;
 }
 
 .popup-image-placeholder {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.2rem;
-  border: 2px dashed var(--color-border);
   background: var(--color-bg);
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
-}
-
-.popup-image-placeholder span:first-child {
-  font-size: 1.4rem;
+  border-style: dashed;
+  font-size: 1.8rem;
   opacity: 0.6;
 }
 
 .popup-facts {
   display: flex;
-  gap: 0.5rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.35rem 0 0;
 }
 
 .popup-fact {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  flex: 1 1 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
 }
 
 .popup-fact-label {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
 }
 
 .popup-fact-value {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--color-pitch-dark);
 }
 
@@ -352,7 +426,7 @@ a:hover {
   flex-wrap: wrap;
   justify-content: center;
   gap: 1.5rem;
-  margin: 0.6rem 0;
+  margin: 0.5rem 0 0;
   font-size: 0.9rem;
 }
 
@@ -368,10 +442,29 @@ a:hover {
 }
 
 .popup-bbl-dots {
-  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
-/* Ampelschema nach Bewertung: 0-1 rot, 2-3 gelb, 4-5 grün */
+.popup-bbl-punkt {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-border);
+}
+
+.popup-bbl-punkt-voll {
+  background: currentColor;
+}
+
+.popup-bbl-punkt-halb {
+  background: linear-gradient(to right, currentColor 50%, var(--color-border) 50%);
+}
+
+/* Ampelschema nach Bewertung: < 2.5 rot, < 4 gelb, ab 4 grün */
 .popup-bbl-rot .popup-bbl-dots {
   color: var(--color-accent);
 }
@@ -384,31 +477,35 @@ a:hover {
   color: var(--color-pitch);
 }
 
-.popup-bbl-gesamt {
-  padding-left: 1.5rem;
-  border-left: 1px solid var(--color-border);
+.popup-gesamt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.3rem 0 0;
 }
 
-.popup-bbl-gesamt .popup-bbl-label {
-  color: var(--color-text);
+.popup-gesamt .popup-fact-label {
   font-weight: 700;
+  color: var(--color-text);
 }
 
 .popup-content .popup-kommentar {
   font-size: 0.9rem;
-  margin: 0.5rem 0;
+  margin: 0.5rem 0 0;
 }
 
 .popup-video {
-  display: inline-block;
-  margin-top: 0.4rem;
-  padding: 0.4rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0.35rem 0.8rem;
   border-radius: 999px;
   background: var(--color-accent);
   color: #fff;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .popup-video:hover {
@@ -421,6 +518,7 @@ a:hover {
   padding: 0;
   color: var(--color-text-muted);
   font-weight: 500;
+  font-size: 0.8rem;
 }
 
 /* Popup wächst seitlich vom Pin statt darüber */
@@ -434,6 +532,7 @@ a:hover {
 
 .leaflet-popup.popup-card .leaflet-popup-content-wrapper {
   position: relative;
+  overflow: hidden;
 }
 
 .leaflet-popup.popup-card .leaflet-popup-content-wrapper::after {
@@ -443,8 +542,12 @@ a:hover {
   left: 0;
   right: 0;
   height: 4px;
-  border-radius: 12px 12px 0 0;
   background: linear-gradient(to right, var(--color-accent), var(--color-gold), var(--color-pitch));
+}
+
+.leaflet-popup.popup-card .leaflet-popup-close-button {
+  top: 8px !important;
+  right: 8px !important;
 }
 
 /* Generic content pages */
@@ -542,15 +645,26 @@ a:hover {
   }
 }
 
-/* Tablet und größer: etwas mehr Luft */
+/* Tablet und größer: etwas mehr Luft, ausführlicher Intro-Text statt Kurzfassung */
 @media (min-width: 600px) {
   .site-header {
+    padding-top: max(0.85rem, env(safe-area-inset-top));
+    padding-bottom: 0.85rem;
     padding-left: max(2rem, env(safe-area-inset-left));
     padding-right: max(2rem, env(safe-area-inset-right));
   }
 
   .intro {
+    margin-top: 1.25rem;
     padding: 0 2rem;
+  }
+
+  .intro-text--kurz {
+    display: none;
+  }
+
+  .intro-text--lang {
+    display: block;
   }
 
   .page-content {
@@ -571,4 +685,50 @@ a:hover {
   .page-content {
     padding-top: 3.5rem;
   }
+}
+
+/* Lightbox: großes Overlay für Popup-Fotos */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.25rem;
+  background: rgba(10, 14, 12, 0.9);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox-img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
 }

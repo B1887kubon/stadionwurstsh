@@ -58,7 +58,7 @@ Felder:
 - `datum` – ISO-Format `YYYY-MM-DD`
 - `ergebnis` – optional, Endstand, z.B. `"3:2"`
 - `eintrittspreis` – optional, z.B. `"5,00 €"`
-- `bbl_bratwurst`, `bbl_bier`, `bbl_limo` – Bewertung von 1 bis 5. Aus diesen drei Werten berechnet die Karte automatisch die Gesamtbewertung
+- `bbl_bratwurst`, `bbl_bier`, `bbl_limo` – Bewertung von 1 bis 5, auch halbe Punkte sind möglich (z.B. `3.5`, wird als halbgefüllter Punkt angezeigt). Aus diesen drei Werten berechnet die Karte automatisch die Gesamtbewertung
 - `kommentar` – optionaler Freitext
 - `youtube_url` – optional, leer lassen, solange das Video noch nicht online ist
 

@@ -7,21 +7,20 @@
   <title>Über das Projekt | Stadionwurstkarte SH</title>
   <meta name="description" content="Vater und Sohn auf Tour durch die Amateurfußball-Ligen Schleswig-Holsteins: Wie der BBL-Check aus Bratwurst, Bier und Limo entsteht und warum es diese Karte gibt." />
   <meta name="robots" content="index, follow" />
-  <!-- TODO: Platzhalter-Domain ersetzen, sobald die Seite unter einer echten Domain live ist (siehe README) -->
-  <link rel="canonical" href="https://stadionwurstkarte-sh.example/ueber.html" />
+  <link rel="canonical" href="https://wurst-atlas.de/ueber.html" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Stadionwurstkarte SH" />
   <meta property="og:title" content="Über das Projekt | Stadionwurstkarte SH" />
   <meta property="og:description" content="Vater und Sohn auf Tour durch die Amateurfußball-Ligen Schleswig-Holsteins: Wie der BBL-Check aus Bratwurst, Bier und Limo entsteht und warum es diese Karte gibt." />
-  <meta property="og:url" content="https://stadionwurstkarte-sh.example/ueber.html" />
-  <meta property="og:image" content="https://stadionwurstkarte-sh.example/assets/og-image.png" />
+  <meta property="og:url" content="https://wurst-atlas.de/ueber.html" />
+  <meta property="og:image" content="https://wurst-atlas.de/assets/og-image.png" />
   <meta property="og:locale" content="de_DE" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Über das Projekt | Stadionwurstkarte SH" />
   <meta name="twitter:description" content="Vater und Sohn auf Tour durch die Amateurfußball-Ligen Schleswig-Holsteins." />
-  <meta name="twitter:image" content="https://stadionwurstkarte-sh.example/assets/og-image.png" />
+  <meta name="twitter:image" content="https://wurst-atlas.de/assets/og-image.png" />
 
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <link rel="stylesheet" href="css/style.css" />
@@ -32,7 +31,10 @@
       <img src="assets/logo.svg" alt="" class="site-logo-icon" />
       Stadionwurstkarte <span>SH</span>
     </a>
-    <nav class="site-nav">
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menü">
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav">
       <a href="index.html">Karte</a>
       <a href="ueber.html" aria-current="page">Über das Projekt</a>
       <a href="impressum.html">Impressum</a>
@@ -82,5 +84,7 @@
   <footer class="site-footer">
     <a href="impressum.html">Impressum</a>
   </footer>
+
+  <script src="js/nav.js"></script>
 </body>
 </html>

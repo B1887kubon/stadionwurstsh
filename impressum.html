@@ -8,8 +8,7 @@
   <meta name="description" content="Impressum und Anbieterkennzeichnung der Stadionwurstkarte SH." />
   <!-- Impressum-Seiten sollen üblicherweise nicht in Suchergebnissen ranken, aber crawlbar bleiben -->
   <meta name="robots" content="noindex, follow" />
-  <!-- TODO: Platzhalter-Domain ersetzen, sobald die Seite unter einer echten Domain live ist (siehe README) -->
-  <link rel="canonical" href="https://stadionwurstkarte-sh.example/impressum.html" />
+  <link rel="canonical" href="https://wurst-atlas.de/impressum.html" />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -19,7 +18,10 @@
       <img src="assets/logo.svg" alt="" class="site-logo-icon" />
       Stadionwurst<span>karte SH</span>
     </a>
-    <nav class="site-nav">
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menü">
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav">
       <a href="index.html">Karte</a>
       <a href="ueber.html">Über das Projekt</a>
       <a href="impressum.html" aria-current="page">Impressum</a>
@@ -71,5 +73,7 @@
   <footer class="site-footer">
     <a href="impressum.html">Impressum</a>
   </footer>
+
+  <script src="js/nav.js"></script>
 </body>
 </html>

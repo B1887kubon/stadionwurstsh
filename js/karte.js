@@ -4,17 +4,38 @@
   var KARTE_ZOOM = 8;
   var POPUP_ABSTAND = 16; // Lücke zwischen Pin und Popup in px
 
+  // Rundet auf halbe Schritte (z.B. 3.3 -> 3.5, 3.83 -> 4.0), damit auch halbe Bewertungen wie 3.5
+  // möglich sind. Sowohl die Punkte-Anzeige als auch die Ampelfarbe rechnen mit diesem gerundeten
+  // Wert, sonst können z.B. bei der automatisch berechneten Gesamtbewertung Punkte (die "4" zeigen)
+  // und Farbe (die noch auf Basis von 3.83 rot/gelb einstuft) auseinanderlaufen.
+  function rundeAufHalbePunkte(wert) {
+    return Math.round((wert || 0) * 2) / 2;
+  }
+
   function bblBalken(wert) {
-    var gerundet = Math.round(wert) || 0;
-    var voll = "●".repeat(gerundet);
-    var leer = "○".repeat(5 - gerundet);
-    return voll + leer;
+    // Punkte werden als einheitlich große CSS-Kreise gerendert statt als Unicode-Zeichen, damit
+    // voll/halb/leer garantiert exakt gleich groß sind (Schriftarten stellen ●/◐/○ unterschiedlich dar).
+    var halbeSchritte = rundeAufHalbePunkte(wert);
+    var voll = Math.floor(halbeSchritte);
+    var halb = halbeSchritte - voll === 0.5 ? 1 : 0;
+    var leer = Math.max(0, 5 - voll - halb);
+    var punkte = "";
+    for (var i = 0; i < voll; i++) {
+      punkte += '<span class="popup-bbl-punkt popup-bbl-punkt-voll"></span>';
+    }
+    if (halb) {
+      punkte += '<span class="popup-bbl-punkt popup-bbl-punkt-halb"></span>';
+    }
+    for (var j = 0; j < leer; j++) {
+      punkte += '<span class="popup-bbl-punkt popup-bbl-punkt-leer"></span>';
+    }
+    return punkte;
   }
 
   function bblFarbKlasse(wert) {
-    var gerundet = Math.round(wert) || 0;
-    if (gerundet <= 1) return "popup-bbl-rot";
-    if (gerundet <= 3) return "popup-bbl-gelb";
+    var w = rundeAufHalbePunkte(wert);
+    if (w < 2.5) return "popup-bbl-rot";
+    if (w < 4) return "popup-bbl-gelb";
     return "popup-bbl-gruen";
   }
 
@@ -50,8 +71,10 @@
       : "";
 
     var bild = spiel.bild
-      ? '<img class="popup-image" src="' + spiel.bild + '" alt="Impression vom Spieltag" />'
-      : '<div class="popup-image popup-image-placeholder" aria-hidden="true"><span>📷</span><span>Foto folgt</span></div>';
+      ? '<button type="button" class="popup-image-thumb-btn" data-full-src="' + spiel.bild + '" aria-label="Foto vergrößern">' +
+        '<img class="popup-image-thumb" src="' + spiel.bild + '" alt="Impression vom Spieltag" loading="lazy" />' +
+        "</button>"
+      : '<div class="popup-image-thumb popup-image-placeholder" aria-hidden="true"><span>📷</span></div>';
 
     var fakten = [];
     if (spiel.ergebnis) {
@@ -66,10 +89,10 @@
         fakten
           .map(function (f) {
             return (
-              '<div class="popup-fact">' +
+              '<span class="popup-fact">' +
               '<span class="popup-fact-label">' + f.label + "</span>" +
               '<span class="popup-fact-value">' + f.value + "</span>" +
-              "</div>"
+              "</span>"
             );
           })
           .join("") +
@@ -79,31 +102,38 @@
     var gesamt = gesamtbewertung(spiel);
     var gesamtHtml =
       gesamt !== null
-        ? '<div class="popup-bbl-item popup-bbl-gesamt ' + bblFarbKlasse(gesamt) + '"><span class="popup-bbl-label">Gesamt</span><span class="popup-bbl-dots">' + bblBalken(gesamt) + "</span></div>"
+        ? '<div class="popup-gesamt ' + bblFarbKlasse(gesamt) + '"><span class="popup-fact-label">Gesamt</span><span class="popup-bbl-dots">' + bblBalken(gesamt) + "</span></div>"
         : "";
 
     var video = spiel.youtube_url
-      ? '<a class="popup-video" href="' + spiel.youtube_url + '" target="_blank" rel="noopener">Video ansehen ▶</a>'
-      : '<span class="popup-video popup-video-muted">Video folgt in Kürze</span>';
+      ? '<a class="popup-video" href="' + spiel.youtube_url + '" target="_blank" rel="noopener">Video ▶</a>'
+      : '<span class="popup-video popup-video-muted">Video folgt</span>';
 
     var kommentar = spiel.kommentar
       ? '<p class="popup-kommentar">' + spiel.kommentar + "</p>"
       : "";
 
+    // Video sitzt oben neben dem Vereinsnamen, damit man es sofort sieht, ohne im Popup scrollen
+    // zu müssen. Das Bild ist ein Vorschaubild rechts neben Vereinsinfos/Fakten; ein Klick öffnet
+    // es groß und unbeschnitten in einem Overlay (siehe lightboxOeffnen weiter unten).
     return (
       '<div class="popup-content">' +
-      '<div class="popup-header">' +
-      '<div class="popup-identity">' +
+      '<div class="popup-top">' +
       '<div class="popup-team-name-row">' +
       logo +
       "<h3>" + spiel.verein_heim + "</h3>" +
       "</div>" +
+      video +
+      "</div>" +
+      '<div class="popup-header">' +
+      '<div class="popup-identity">' +
       gegner +
       '<p class="popup-liga">' + spiel.liga + " &middot; " + spiel.ort + " &middot; " + formatDatum(spiel.datum) + "</p>" +
       adresse +
+      faktenHtml +
+      gesamtHtml +
       "</div>" +
       '<div class="popup-side">' +
-      faktenHtml +
       bild +
       "</div>" +
       "</div>" +
@@ -111,41 +141,28 @@
       '<div class="popup-bbl-item ' + bblFarbKlasse(spiel.bbl_bratwurst) + '"><span class="popup-bbl-label">Bratwurst</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_bratwurst) + "</span></div>" +
       '<div class="popup-bbl-item ' + bblFarbKlasse(spiel.bbl_bier) + '"><span class="popup-bbl-label">Bier</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_bier) + "</span></div>" +
       '<div class="popup-bbl-item ' + bblFarbKlasse(spiel.bbl_limo) + '"><span class="popup-bbl-label">Limo</span><span class="popup-bbl-dots">' + bblBalken(spiel.bbl_limo) + "</span></div>" +
-      gesamtHtml +
       "</div>" +
       kommentar +
-      video +
       "</div>"
     );
   }
 
-  // Berechnet Breite, Höhe und Versatz des Popups anhand des tatsächlich verfügbaren Platzes
-  // rund um den Pin, damit die Card garantiert innerhalb der Karte bleibt (kein autoPan nötig,
-  // das bei mehrfachem Aufruf mit wechselnden Maßen die Karte an eine völlig falsche Stelle
-  // verschieben kann).
-  function popupOptionenBerechnen(karte, marker) {
+  // Berechnet eine Standardgröße für das Popup, die nur von der Kartengröße abhängt – nicht von
+  // Zoom-Level oder der genauen Pixel-Position des angeklickten Pins. Vorher richtete sich die
+  // Größe nach dem Platz neben dem Pin an seiner aktuellen Bildschirmposition, wodurch die Card
+  // beim Reinzoomen und je nach Klickposition ständig ihre Größe änderte. Da die Karte beim Klick
+  // ohnehin auf den Pin zentriert wird (siehe marker.on("click", ...)), landet der Pin danach immer
+  // in der Kartenmitte, und die Card kann eine feste, vorhersagbare Größe haben.
+  function popupOptionenBerechnen(karte) {
     var kartenGroesse = karte.getSize();
-    var punkt = karte.latLngToContainerPoint(marker.getLatLng());
-    var randPuffer = 16;
 
-    var platzRechts = kartenGroesse.x - punkt.x - randPuffer;
-    var platzLinks = punkt.x - randPuffer;
-    var rechts = platzRechts >= platzLinks;
-    var verfuegbareBreite = Math.max(platzRechts, platzLinks) - POPUP_ABSTAND;
+    var maxBreite = Math.min(380, Math.max(240, kartenGroesse.x * 0.46));
+    var minBreite = Math.min(240, maxBreite);
+    var maxHoehe = Math.min(420, Math.max(180, kartenGroesse.y * 0.5 - 40));
 
-    // Nie mehr verlangen als tatsächlich verfügbar ist (sonst Clipping durch overflow:hidden
-    // am Kartenrand) – 200px als unterste, noch nutzbare Grenze für sehr schmale Screens.
-    var maxBreite = Math.min(600, Math.max(200, verfuegbareBreite));
-    var minBreite = Math.min(200, maxBreite);
-
-    // Der Kartencontainer schneidet alles ab, was über seine Oberkante hinausragt (overflow: hidden).
-    // Da das Popup von der Pin-Position aus nach oben wächst, darf es nie höher sein als der Platz
-    // zwischen Pin und Kartenoberkante – sonst landen Inhalt und Schließen-Button im unsichtbaren,
-    // nicht klickbaren Bereich.
-    var platzOben = punkt.y - 60;
-    var maxHoehe = Math.max(160, Math.min(kartenGroesse.y - 96, platzOben));
-
-    var offsetX = rechts ? maxBreite / 2 + POPUP_ABSTAND : -(maxBreite / 2 + POPUP_ABSTAND);
+    // Pin landet nach dem Zentrieren immer in der Kartenmitte, die Card wächst deshalb immer
+    // nach rechts (Platz links/rechts ist danach ohnehin symmetrisch).
+    var offsetX = maxBreite / 2 + POPUP_ABSTAND;
 
     return {
       maxWidth: maxBreite,
@@ -176,11 +193,16 @@
           var marker = L.marker([spiel.koordinaten.lat, spiel.koordinaten.lng]).addTo(karte);
           var popup = L.popup({ className: "popup-card", autoPan: false }).setContent(popupHtml(spiel));
 
-          // Maße VOR dem ersten Öffnen setzen (nicht erst im popupopen-Event), damit Leaflet
-          // beim Öffnen direkt mit den richtigen Werten rechnet statt erst mit Standardmaßen
-          // zu öffnen und danach zu korrigieren.
+          // Beim Klick auf den Pin die Karte darauf zentrieren (bekanntes, vorhersagbares
+          // Kartenverhalten) und die Maße VOR dem ersten Öffnen setzen (nicht erst im
+          // popupopen-Event), damit Leaflet beim Öffnen direkt mit den richtigen Werten rechnet
+          // statt erst mit Standardmaßen zu öffnen und danach zu korrigieren.
+          // Wichtig: ohne Animation zentrieren – mit animiertem panTo() bricht Leaflets
+          // Klick-Toggle für das erneute Öffnen des Popups nach dem Schließen (Ursache nicht
+          // abschließend geklärt, vermutlich Kollision mit dem laufenden Pan im selben Klick-Tick).
           marker.on("click", function () {
-            var optionen = popupOptionenBerechnen(karte, marker);
+            karte.panTo(marker.getLatLng(), { animate: false });
+            var optionen = popupOptionenBerechnen(karte);
             popup.options.maxWidth = optionen.maxWidth;
             popup.options.minWidth = optionen.minWidth;
             popup.options.maxHeight = optionen.maxHeight;
@@ -189,9 +211,9 @@
 
           // Der Kartencontainer schneidet alles oberhalb seiner eigenen Oberkante ab
           // (overflow: hidden). Die Schätzung in popupOptionenBerechnen ist bewusst grob,
-          // deshalb hier einmalig anhand der tatsächlich gerenderten Position nachkorrigieren.
-          // autoPan ist deaktiviert, ein zweiter update()-Aufruf verschiebt die Karte also nicht.
-          marker.on("popupopen", function () {
+          // deshalb hier anhand der tatsächlich gerenderten Position nachkorrigieren.
+          // autoPan ist deaktiviert, ein weiterer update()-Aufruf verschiebt die Karte also nicht.
+          function ueberstandKorrigieren() {
             var element = popup.getElement();
             if (!element) return;
 
@@ -205,12 +227,18 @@
               popup.options.maxHeight = Math.max(140, popup.options.maxHeight - ueberstand - 8);
               popup.update();
             }
+          }
 
-            // Erst NACH dem letzten update()-Aufruf setzen: update() rendert den Inhalt aus dem
-            // ursprünglichen HTML-String neu und würde eine vorher gesetzte Klasse wieder verwerfen.
-            var inhaltEl = element.querySelector(".popup-content");
-            if (inhaltEl) {
-              inhaltEl.classList.toggle("popup-schmal", popup.options.maxWidth < 260);
+          marker.on("popupopen", function () {
+            ueberstandKorrigieren();
+
+            // Das Bild lädt asynchron nach und wächst danach ggf. noch – erst nach dem Laden
+            // steht die tatsächliche Höhe fest, deshalb hier ein zweites Mal prüfen.
+            var element = popup.getElement();
+            var bild = element && element.querySelector(".popup-image-thumb");
+            if (bild && !bild.complete) {
+              bild.addEventListener("load", ueberstandKorrigieren, { once: true });
+              bild.addEventListener("error", ueberstandKorrigieren, { once: true });
             }
           });
 
@@ -230,7 +258,56 @@
       });
   }
 
+  // Lightbox: zeigt Popup-Fotos groß und unbeschnitten in einem Overlay statt in einem neuen Tab.
+  // Ein einzelnes Overlay-Element wird wiederverwendet, egal welches Vorschaubild angeklickt wird.
+  function lightboxEinrichten() {
+    var overlay = null;
+
+    function erstellen() {
+      var el = document.createElement("div");
+      el.className = "lightbox";
+      el.hidden = true;
+      el.innerHTML =
+        '<button type="button" class="lightbox-close" aria-label="Schließen">&times;</button>' +
+        '<img class="lightbox-img" alt="" />';
+      document.body.appendChild(el);
+      return el;
+    }
+
+    function oeffnen(src, alt) {
+      if (!overlay) overlay = erstellen();
+      var bild = overlay.querySelector(".lightbox-img");
+      bild.src = src;
+      bild.alt = alt || "";
+      overlay.hidden = false;
+      document.body.classList.add("lightbox-aktiv");
+    }
+
+    function schliessen() {
+      if (!overlay || overlay.hidden) return;
+      overlay.hidden = true;
+      document.body.classList.remove("lightbox-aktiv");
+    }
+
+    document.addEventListener("click", function (event) {
+      var knopf = event.target.closest && event.target.closest(".popup-image-thumb-btn");
+      if (knopf) {
+        oeffnen(knopf.getAttribute("data-full-src"), "Impression vom Spieltag");
+        return;
+      }
+      if (overlay && !overlay.hidden && (event.target === overlay || event.target.closest(".lightbox-close"))) {
+        schliessen();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") schliessen();
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    lightboxEinrichten();
+
     var kartenEl = document.getElementById("karte");
     if (!kartenEl) return;
 
