@@ -353,6 +353,11 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende'
     }).addTo(karte);
 
+    // Für js/cookie-consent.js: Wenn der Cookie-Banner ein-/ausgeblendet wird und dabei die
+    // Kartenhöhe ändert, muss Leaflet per invalidateSize() darüber informiert werden, sonst
+    // rendert es mit der alten Größe und Pins landen hinter dem Banner.
+    window.stadionwurstKarte = karte;
+
     var emptyStateEl = document.getElementById("empty-state");
     ladeSpiele(karte, emptyStateEl);
   });

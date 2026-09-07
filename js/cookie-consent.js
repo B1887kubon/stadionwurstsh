@@ -20,6 +20,23 @@
     }
   }
 
+  // Das fixierte Banner am unteren Bildschirmrand kann auf dem Handy Kartenpins verdecken und
+  // deren Taps abfangen. Deshalb der Karte per invalidateSize() mitteilen, dass sie kleiner
+  // werden soll, solange das Banner sichtbar ist (siehe #karte-Regel in style.css).
+  function kartenGroesseAktualisieren() {
+    var karte = window.stadionwurstKarte;
+    if (!karte || typeof karte.invalidateSize !== "function") return;
+    requestAnimationFrame(function () {
+      karte.invalidateSize();
+    });
+  }
+
+  function bannerVerstecken(banner) {
+    banner.remove();
+    document.body.classList.remove("cookie-banner-sichtbar");
+    kartenGroesseAktualisieren();
+  }
+
   function bannerAnzeigen() {
     if (document.querySelector(".cookie-banner")) return;
 
@@ -41,11 +58,14 @@
     banner.querySelectorAll("[data-wahl]").forEach(function (button) {
       button.addEventListener("click", function () {
         entscheidungSpeichern(button.getAttribute("data-wahl"));
-        banner.remove();
+        bannerVerstecken(banner);
       });
     });
 
     document.body.appendChild(banner);
+    document.documentElement.style.setProperty("--cookie-banner-hoehe", banner.offsetHeight + "px");
+    document.body.classList.add("cookie-banner-sichtbar");
+    kartenGroesseAktualisieren();
   }
 
   document.addEventListener("DOMContentLoaded", function () {
