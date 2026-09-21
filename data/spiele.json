@@ -55,5 +55,24 @@
     "bbl_limo": 4,
     "kommentar": "Spätsommer, Sonnenschein, B-Klasse und kein Parkplatz. Am Sonntag waren wir zum BBL-Test im beschaulichen Diekhusen-Fahrstedt. Die Zwote spielte bereits, so dass die Parkplatzkapazitäten im kleinen Wohngebiet schon sehr erschöpft waren. Nach einem kleinen Spaziergang kamen wir dann am Stadion an, eine kleine Tribüne und ein nettes Vereinsheim begrüßten uns schon. Am netten Kassierer angekommen, schluckten wir allerdings das erste Mal, keine Ermäßigung für Schüler und dann stolze 3€ für ein Spiel in der B-Klasse. Das Dithmarscher kam vom Fass und die 0,3l Becher kosteten 2€, die Cola war kalt und aus der Glasflasche (auch 2€) und die Bratwurst vom Elektrogrill stand auch mit 2€ zu buche (Currywurst für 2,50€). Die Wurst war okay, nichts besonderes aber solide, frisch und von Thüringer Art. Das Brot war sehr frisch und der Service total nett. Allgemein herrschte eine sehr nette, familiäre Atmosphäre. Das Spiel war seiner Klasse entsprechend, viele Fehler bei den Basics, eine unterirdische Schiedsrichterleistung, ordentlich Gemotze und ganz viel Körper (die offene Sohle gehört auch zum menschlichen Körper). Die Heimmannschaft gewann am Ende deutlich mit 3:0, dass Spiel hätte aber auch locker andersherum ausgehen können. Besondere Highlight waren die Meckerecke der Dorfältesten und das Fachwissen der aktiven Spieler (Thema 'Rückpassregel'). Auf jeden Fall ist Diekhusen-Fahrstedt eine Reise wert.",
     "youtube_url": ""
+  },
+  {
+    "id": "004",
+    "verein_heim": "TuRa Meldorf",
+    "verein_gast": "Kaltenkirchener TS II",
+    "verein_heim_logo": "./assets/img/turalogo-1000x1000.jpg",
+    "bild": "./assets/img/",
+    "ort": "Meldorf",
+    "liga": "Verbandsliga West",
+    "stadion_adresse": "Otto-Nitsch-Weg, 25704 Meldorf",
+    "koordinaten": { "lat": 54.099624, "lng": 9.069481 },
+    "datum": "2026-20-09",
+    "ergebnis": "3:2",
+    "eintrittspreis": "4,00 €",
+    "bbl_bratwurst": 4.5,
+    "bbl_bier": 2,
+    "bbl_limo": 2.5,
+    "kommentar": "Am Sonntag, bei schönstem Wetter, waren wir beim TSV Barlt zu Gast. Als wir ankamen, waren wir die einzigen Menschen auf der gesamten, schönen Anlage. Nachdem wir dann unseren Eintritt bezahlt hatten, gab es erstmal etwas zu trinken. Dithmarscher vom Fass für 3,50€ und Cola, eiskalt aus der Glasflasche für 2,00€. Die Bratwurst gab es aus dem Brötchen für 3,00€ (ohne Brötchen für 2,00€). Die Wurst war hervorragend, auch die Auswahl der Soßen hatte schon mindestens Regionalliga-Niveau. Allerdings waren die Brötchen ein echter Minuspunkt, viel zu lange auf dem Grill angeheizt, glichen die eher einem Stein als weizenhaltiger Lockerheit. Das Spiel war in der ersten Halbzeit eher ausgeglichen, viele Standards und einige Chancen auf beiden Seiten. Eher ein launiger Sommerkick. In der zweiten Hälfte ging das Niveau nicht unbedingt nach oben aber es fielen Tore und Karten. Nach der verdienten Führung durch Barlt hagelte es für einen Spieler von Kurd die Gelb-Rote Karte, aus der der Spieler, durch Motzen im Abgang, dann aber noch glatt Rot machte. FC Kurd kam in Unterzahl noch zum Ausgleich, ehe der TSV Barlt kurz vor Schluss doch noch den Deckel drauf machte. Ein Ausflug nach Barlt ist auf jeden Fall eine Bratwurst wert.",
+    "youtube_url": ""
   }
 ]
